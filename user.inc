@@ -42,9 +42,10 @@ class DingUserMigration extends DrupalUser6Migration {
 
   }
 
-   public function prepareRow($row) {
+  public function prepareRow($row) {
     // If user has a mail address, run check for existing mail address as same email for 2 users stops user_save process
-    if (!empty($row->mail)) {
+    // Don't do anything if user is an ALMA provider user, as they will not cause problems
+    if (!empty($row->mail) && !strpos($row->name, "@alma_user")) {
       // Check if user with the same email already exists in destination table "users"
       if (user_load_by_mail($row->mail)) {
         //user found - modify email before saving (to ensure user is saved as a new distinct user)
@@ -54,7 +55,7 @@ class DingUserMigration extends DrupalUser6Migration {
         $row->mail = $email_modified;
 
         // Logging
-        watchdog('migrate_ding1_ding2', 'User with same email (%email_existing) found in destination - modifying email (to %email_new) to force a new distinct user to be created', array('%email_existing'=>$email_found, '%email_new' => $email_modified), WATCHDOG_INFO);
+        watchdog('migrate_ding1_ding2', 'User with same email (%email_existing) found in destination - modifying mail of %username (to %email_new) to force a new distinct user to be created', array('%email_existing'=>$email_found, '%username' =>$row->name, '%email_new' => $email_modified), WATCHDOG_INFO);
       }
     }
   }
