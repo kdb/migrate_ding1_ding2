@@ -17,22 +17,26 @@ Download and enable the module on an existing Ding2 installation.
 
 In settings.php, point to the ding1 site database you are migrating from. Add this entry to your settings.php file:
 
-$databases['legacy']['default'] = array (
-  'database' => 'DATABASE_NAME',
-  'username' => 'DATABASE_USER',
-  'password' => 'PASSWORD',
-  'host' => 'localhost',
-  'port' => '',
-  'driver' => 'mysql',
-  'prefix' => '',
-);
+    $databases['legacy']['default'] = array (
+      'database' => 'DATABASE_NAME',
+      'username' => 'DATABASE_USER',
+      'password' => 'PASSWORD',
+      'host' => 'localhost',
+      'port' => '',
+      'driver' => 'mysql',
+      'prefix' => '',
+    );
 
 Substituting your own connection info. 
 "Legacy" is the default database which the migrate module will try to connect to.
 
 Also, in settings.php, add this line, supplying your own absolute path where your ding1 site's files reside:
-$conf['migrate_ding1_ding2_source_dir'] = '/home/YOUR-DING1-SITE/sites/default/files';
+    $conf['migrate_ding1_ding2_source_dir'] = '/home/YOUR-DING1-SITE/sites/default/files';
 
+If you plan to migrate users (and you probably would), make sure to transfer the variable drupal_private_key from your ding1 installation to the new ding-site. Using drush, you can navigate to your old ding1 site and get your drupal_private_key with:
+    drush vget drupal_private_key
+Now, navigate to your ding2 site, and insert the key with:
+    drush vset drupal_private_key {KEY-VALUE}
 
 Configuration of the module
 ---------------------------
