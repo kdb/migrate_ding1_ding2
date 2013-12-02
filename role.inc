@@ -13,8 +13,8 @@ class DingRoleMigration extends DrupalRole6Migration {
       'source_version' => 6,
       'role_mappings' => array(
         'administrator' => 'administrator',
-        'author' => 'formidler',
-        'editor' => 'redaktør',
+        'author' => 'provider',
+        'editor' => 'editor',
       ),
     );
     
