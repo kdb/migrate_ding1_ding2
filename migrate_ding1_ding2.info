@@ -6,6 +6,7 @@ core = 7.x
 dependencies[] = migrate
 dependencies[] = migrate_extras
 dependencies[] = migrate_d2d
+dependencies[] = date_migrate
 
 #  include the files that contain your Migrate classes
 files[] = migrate_ding1_ding2.migrate.inc
