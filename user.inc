@@ -51,10 +51,10 @@ class DingUserMigration extends DrupalUser6Migration {
       $email_parts = explode("@", $email_found);
       $email_modified = $email_parts[0] . "_1@" . $email_parts[1];
       $row->mail = $email_modified;
-    }
 
-    // Logging
-    watchdog('migrate_ding1_ding2', 'User with same email (%email_existing) found in destination - modifying email (to %email_new) to force a new distinct user to be created', array('%email_existing'=>$email_found, '%email_new' => $email_modified), WATCHDOG_INFO);
+      // Logging
+      watchdog('migrate_ding1_ding2', 'User with same email (%email_existing) found in destination - modifying email (to %email_new) to force a new distinct user to be created', array('%email_existing'=>$email_found, '%email_new' => $email_modified), WATCHDOG_INFO);
+    }
   }
   
 }
