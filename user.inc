@@ -41,4 +41,20 @@ class DingUserMigration extends DrupalUser6Migration {
     ));
 
   }
+  
+   public function prepareRow($row) {
+    // Users with same email is not allowed i drupal
+    // Check if user with the same email already exists in destination table "users"
+    if (user_load_by_mail($row->mail)) {
+      //user found - modify email before saving (to ensure user is saved as a new distinct user)
+      $email_found = $row->mail;
+      $email_parts = explode("@", $email_found);
+      $email_modified = $email_parts[0] . "_1@" . $email_parts[1];
+      $row->mail = $email_modified;
+    }
+
+    // Logging
+    watchdog('migrate_ding1_ding2', 'User with same email (%email_existing) found in destination - modifying email (to %email_new) to force a new distinct user to be created', array('%email_existing'=>$email_found, '%email_new' => $email_modified), WATCHDOG_INFO);
+  }
+  
 }
