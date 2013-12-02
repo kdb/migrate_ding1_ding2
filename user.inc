@@ -35,9 +35,7 @@ class DingUserMigration extends DrupalUser6Migration {
 
     // Unmapped destination fields
     $this->addUnmigratedDestinations(array(
-      'group_audience',
-      'group_audience:state',
-      'group_audience:created',
+      'og_user_node',
     ));
 
   }
