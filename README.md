@@ -6,9 +6,13 @@ The module provides migration classes for performing migrations from a Ding/Drup
 Dependencies
 ------------
 
-This module depends on the [http://drupal.org/project/migrate](migrate), [http://drupal.org/project/migrate_extras](migrate_extras) and [http://drupal.org/project/migrate_d2d](migrate_d2d) modules.
-Included is ding_migrate_extras, which contain Field Handlers needed by migrate_ding1_ding2. These handlers might or might not be availaible depending on the ding2 installation, and so it can be necessary to enable ding_migrate_extras.
-For example, MigrateLinkFieldHandler is included with Link 7.x-1.1, but at present, the ding2 distribution only includes Link 7.x-1.0. 
+This module depends on the following modules:
+
+* [http://drupal.org/project/migrate](migrate) (version 7.x-2.6-RC1 or above)
+* [http://drupal.org/project/migrate_extras](migrate_extras) 
+* [http://drupal.org/project/migrate_d2d](migrate_d2d) (version 7.x-2.1-beta1 or above)
+
+Make sure to get the 2.6-RC1 version of migrate and 2.1-beta1 of migrate_d2d (or above), or migrate_ding1_ding2 will not run.
 
 Installation
 ------------
@@ -34,8 +38,10 @@ Also, in settings.php, add this line, supplying your own absolute path where you
     $conf['migrate_ding1_ding2_source_dir'] = '/home/YOUR-DING1-SITE/sites/default/files';
 
 If you plan to migrate users (and you probably would), make sure to transfer the variable drupal_private_key from your ding1 installation to the new ding-site. Using drush, you can navigate to your old ding1 site and get your drupal_private_key with:
+
     drush vget drupal_private_key
 Now, navigate to your ding2 site, and insert the key with:
+
     drush vset drupal_private_key {KEY-VALUE}
 
 Configuration of the module
