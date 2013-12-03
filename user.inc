@@ -40,26 +40,62 @@ class DingUserMigration extends DrupalUser6Migration {
 
   }
 
+  /**
+   * Review a data row after fetch, returning FALSE to skip it.
+   *
+   * Function REPLACES prepareRow of parent (DrupalUser6Migration) - it doesn't append to it.
+   * This is because the function does not begin with the lines:
+   *
+   *     if (parent::prepareRow($row) === FALSE) {
+   *       return FALSE;
+   *     }
+   *
+   * The purpose of this function replacement is to allow multiple users with same email adresses
+   * to be created - the prepareRow() function in DrupalUser6Migration doesn't allow this.
+   *
+   * See DrupalUser6Migration's prepareRow() function to see original function.
+   *
+   * @param unknown $row
+   * @return boolean
+   */
   public function prepareRow($row) {
-    if (parent::prepareRow($row) === FALSE) {
+    // If we haven't mapped the admin account based on email address, map it
+    // directly to the destination admin account.
+    if ($row->uid == 1) {
+      $new_uid = 1;
+    }
+
+    if (!empty($new_uid)) {
+      $hash = isset($row->migrate_map_hash) ? $row->migrate_map_hash : NULL;
+      $this->map->saveIDMapping($row, array($new_uid), MigrateMap::STATUS_IGNORED,
+        MigrateMap::ROLLBACK_PRESERVE, $hash);
+      $this->rollbackAction = MigrateMap::ROLLBACK_PRESERVE;
       return FALSE;
     }
 
-    // If user has a mail address, run check for existing mail address as same email for 2 users stops user_save process
-    // Don't do anything if user is an ALMA provider user, as they will not cause problems
-    if (!empty($row->mail) && !strpos($row->name, "@alma_user")) {
-      // Check if user with the same email already exists in destination table "users"
-      if (user_load_by_mail($row->mail)) {
-        //user found - modify email before saving (to ensure user is saved as a new distinct user)
-        $email_found = $row->mail;
-        $email_parts = explode("@", $email_found);
-        $email_modified = $email_parts[0] . "_1@" . $email_parts[1];
-        $row->mail = $email_modified;
-
-        // Logging
-        watchdog('migrate_ding1_ding2', 'User with same email (%email_existing) found in destination - modifying mail of %username (to %email_new) to force a new distinct user to be created', array('%email_existing'=>$email_found, '%username' =>$row->name, '%email_new' => $email_modified), WATCHDOG_INFO);
+    // Add the path to the source row, if relevant
+    if ($this->moduleExists('path')) {
+      $path = $this->version->getPath('user/' . $row->uid);
+      if ($path) {
+        $row->path = $path;
       }
     }
+
+    // Pick up profile data.
+    $this->version->getSourceValues($row, $row->uid);
+    // Populate the source roles
+    if ($this->roleMigration) {
+      $result = Database::getConnection('default', $this->sourceConnection)
+                ->select('users_roles', 'ur')
+                ->fields('ur', array('rid'))
+                ->condition('uid', $row->uid)
+                ->execute();
+      foreach ($result as $role_row) {
+        $row->roles[] = $role_row->rid;
+      }
+    }
+
+    return TRUE;
   }
 
 }
