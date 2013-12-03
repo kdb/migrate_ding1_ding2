@@ -59,8 +59,16 @@ class DingUserMigration extends DrupalUser6Migration {
    * @return boolean
    */
   public function prepareRow($row) {
-    // If we haven't mapped the admin account based on email address, map it
-    // directly to the destination admin account.
+    /**
+     * Copied over from migrate/includes/migration.inc
+     */
+    $this->rollbackAction = $this->defaultRollbackAction;
+
+
+    /**
+     * Modified from migrate_d2d/user.inc
+     */
+    // Map the admin account directly to the destination admin account.
     if ($row->uid == 1) {
       $new_uid = 1;
     }
@@ -94,6 +102,23 @@ class DingUserMigration extends DrupalUser6Migration {
         $row->roles[] = $role_row->rid;
       }
     }
+
+
+    /**
+     * Copied over from migrate_d2d/d6/user.inc
+     *
+     * Note that the date module adds a timezone_name column to the users table,
+     * so if present we can use that directly. Otherwise, we do as the D6->D7
+     * upgrade does and just clear it - let users reset their timezones in the
+     * D7 site.
+     */
+    if (!empty($row->timezone_name)) {
+      $row->timezone = $row->timezone_name;
+    }
+    else {
+      $row->timezone = NULL;
+    }
+
 
     return TRUE;
   }
