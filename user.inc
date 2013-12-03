@@ -5,7 +5,7 @@
  */
 class DingUserMigration extends DrupalUser6Migration {
   public function __construct(array $arguments) {
-    $arguments = array(
+    $common_arguments = array(
       'description' => t('Migration of Users from Ding1/D6'),
       'machine_name' => 'DingUser',
       'group_name' => 'ding1_group',
@@ -14,7 +14,7 @@ class DingUserMigration extends DrupalUser6Migration {
       'role_migration' => 'DingRole',
     );
 
-    parent::__construct($arguments);
+    parent::__construct($arguments + $common_arguments);
 
     // Unmapped source fields
     $this->addUnmigratedSources(array(
@@ -41,6 +41,10 @@ class DingUserMigration extends DrupalUser6Migration {
   }
 
   public function prepareRow($row) {
+    if (parent::prepareRow($row) === FALSE) {
+      return FALSE;
+    }
+
     // If user has a mail address, run check for existing mail address as same email for 2 users stops user_save process
     // Don't do anything if user is an ALMA provider user, as they will not cause problems
     if (!empty($row->mail) && !strpos($row->name, "@alma_user")) {
