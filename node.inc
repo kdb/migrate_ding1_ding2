@@ -10,7 +10,7 @@ abstract class DingNodeMigration extends DrupalNode6Migration {
       'source_version' => 6,
       'user_migration' => 'DingUser',
     );
-    
+
     parent::__construct($arguments + $common_arguments);
 
     // With migrate_ui enabled, migration pages will indicate people involved in
@@ -22,16 +22,16 @@ abstract class DingNodeMigration extends DrupalNode6Migration {
 
     $this->addFieldMapping('field_legacy_nid', 'nid')
          ->description('We have a common field to save the D6 nid');
-         
+
     // Unmapped source fields - EXAMPLE
     //$this->addUnmigratedSources(array('vid', 'tnid', 'translate', 'teaser', 'format'));
     // Unmapped destination fields - EXAMPLE
     //$this->addUnmigratedDestinations(array('log', 'tnid', 'translate', 'body:summary', 'body:format', 'body:language', 'comment'))
   }
-  
+
   // function to create ting objects with relations to the node
   public function createDingNodeTingRefs($node, $row) {
-    
+
     if (isset($row->field_ting_refs) && count($row->field_ting_refs) > 0) {
 
       $refs = '';
@@ -48,11 +48,11 @@ abstract class DingNodeMigration extends DrupalNode6Migration {
             // Append to logging string
             $refs .= $ref . ', ';
           }
-          
+
         }
       }
 
-      $refs = rtrim($refs, ', '); 
+      $refs = rtrim($refs, ', ');
 
       // Logging
       if ($refs != '') {
@@ -60,13 +60,13 @@ abstract class DingNodeMigration extends DrupalNode6Migration {
       }
     }
   }
-  
+
 }
 
 
 class DingLibraryMigration extends DingNodeMigration {
   public function __construct($arguments) {
-    
+
     $arguments = array(
       'description' => t('Migration of Libraries from Ding1/D6'),
       'machine_name' => 'DingLibrary',
@@ -76,11 +76,11 @@ class DingLibraryMigration extends DingNodeMigration {
       'dependencies' => array('DingUser','DingFile'),
     );
 
-    // Add to sourceFields before calling parent constructor. 
+    // Add to sourceFields before calling parent constructor.
     // See http://www.acquia.com/blog/drupal-drupal-data-migration-part-2-architecture
     $this->sourceFields['list_image_title'] = t('Title text extracted from field_list_image_data');
     $this->sourceFields['image_title'] = t('Title text extracted from field_image_data');
-    
+
     parent::__construct($arguments);
 
     $this->addFieldMapping('field_ding_library_body', 'body');
@@ -96,15 +96,15 @@ class DingLibraryMigration extends DingNodeMigration {
          ->defaultValue('1');
 
     // Phone and fax comes from location_phone table and is drawn in via the modified query
-    $this->addFieldMapping('field_ding_library_phone_number', 'phone'); 
+    $this->addFieldMapping('field_ding_library_phone_number', 'phone');
     $this->addFieldMapping('field_ding_library_phone_number:language')
          ->defaultValue('und');
-    $this->addFieldMapping('field_ding_library_fax_number', 'fax'); 
+    $this->addFieldMapping('field_ding_library_fax_number', 'fax');
     $this->addFieldMapping('field_ding_library_fax_number:language')
          ->defaultValue('und');
 
     // library slug comes from ding_library table and is drawn in via the modified query
-    $this->addFieldMapping('field_ding_library_slug', 'slug'); 
+    $this->addFieldMapping('field_ding_library_slug', 'slug');
     $this->addFieldMapping('field_ding_library_slug:language')
          ->defaultValue('und');
 
@@ -117,13 +117,13 @@ class DingLibraryMigration extends DingNodeMigration {
     $this->addFieldMapping('field_ding_library_list_image:language')
          ->defaultValue('und');
     $this->addFieldMapping('field_ding_library_list_image:preserve_files')
-         ->defaultValue(FALSE);
+         ->defaultValue(TRUE);
     $this->addFieldMapping('field_ding_library_list_image:alt', 'field_list_image:alt');
     $this->addFieldMapping('field_ding_library_list_image:title', 'list_image_title');
     $this->addFieldMapping(NULL, 'field_list_image:data')
          ->description(t('Split this into list_image_title for D7'));
     $this->addFieldMapping(NULL, 'field_list_image:list');
-    
+
     // Map the image field to the new title image field, base this on the DingFile migration
     // to map the files to the imported files table.
     $this->addFieldMapping('field_ding_library_title_image', 'field_image')
@@ -133,13 +133,13 @@ class DingLibraryMigration extends DingNodeMigration {
     $this->addFieldMapping('field_ding_library_title_image:language')
          ->defaultValue('und');
     $this->addFieldMapping('field_ding_library_title_image:preserve_files')
-         ->defaultValue(FALSE);
+         ->defaultValue(TRUE);
     $this->addFieldMapping('field_ding_library_title_image:alt', 'field_image:alt');
     $this->addFieldMapping('field_ding_library_title_image:title', 'image_title');
     $this->addFieldMapping(NULL, 'field_image:data')
          ->description(t('Split this into image_title for D7'));
     $this->addFieldMapping(NULL, 'field_image:list');
-    
+
     // Map to addressfield. See https://drupal.org/node/1996546.
     $this->addFieldMapping('field_ding_library_addresse', 'country');
     $this->addFieldMapping('field_ding_library_addresse:thoroughfare', 'street');
@@ -148,7 +148,7 @@ class DingLibraryMigration extends DingNodeMigration {
     $this->addFieldMapping('field_ding_library_addresse:administrative_area', 'province');
     $this->addFieldMapping('field_ding_library_addresse:postal_code', 'postal_code');
     $this->addFieldMapping('field_ding_library_addresse:name_line', 'name');
-    
+
     // Map to geofield.
     $this->addFieldMapping('field_ding_library_geocode')
          ->defaultValue('point');
@@ -187,7 +187,7 @@ class DingLibraryMigration extends DingNodeMigration {
     $this->addFieldMapping(NULL, 'field_content_images:alt')
          ->description(t('content images are not mapped to Ding2/D7'))
          ->issueGroup(t('DNM'));
-    
+
     $this->addFieldMapping(NULL, '2')
          ->description(t('Ding2 does not employ the Tags taxonomy (taxonomy "2") for library nodes'))
          ->issueGroup(t('DNM'));
@@ -286,7 +286,7 @@ class DingLibraryMigration extends DingNodeMigration {
     $list_image_data = unserialize($row->field_list_image_data);
     $row->list_image_alt = $list_image_data['alt'];
     $row->list_image_title = $list_image_data['title'];
-    
+
     $image_data = unserialize($row->field_image_data);
     $row->image_alt = $image_data['alt'];
     $row->image_title = $image_data['title'];
@@ -326,7 +326,7 @@ class DingLibraryMigration extends DingNodeMigration {
 
 class DingCampaignMigration extends DingNodeMigration {
   public function __construct($arguments) {
-    
+
     $arguments = array(
       'description' => t('Migration of Campaigns from Ding1/D6'),
       'machine_name' => 'DingCampaign',
@@ -336,11 +336,11 @@ class DingCampaignMigration extends DingNodeMigration {
       'dependencies' => array('DingUser', 'DingFile'),
     );
 
-    // Add to sourceFields before calling parent constructor. 
+    // Add to sourceFields before calling parent constructor.
     // See http://www.acquia.com/blog/drupal-drupal-data-migration-part-2-architecture
     $this->sourceFields['campaign_image_alt'] = t('Alt text extracted from field_campaign_image_data');
     $this->sourceFields['campaign_image_title'] = t('Title text extracted from field_campaign_image_data');
-    
+
     parent::__construct($arguments);
 
     $this->addFieldMapping('field_camp_text_full', 'body')
@@ -370,7 +370,7 @@ class DingCampaignMigration extends DingNodeMigration {
     $this->addFieldMapping('field_camp_text_full:format')
          ->defaultValue('ding_wysiwyg');
     $this->addFieldMapping(NULL, 'field_campaign_image:list');
-         
+
     // Map the image field to the new image field, base this on the Files migration
     // to map the files to the imported files table.
     $this->addFieldMapping('field_camp_image', 'field_campaign_image')
@@ -380,8 +380,8 @@ class DingCampaignMigration extends DingNodeMigration {
     $this->addFieldMapping('field_camp_image:language')
          ->defaultValue('und');
     $this->addFieldMapping('field_camp_image:preserve_files')
-         ->defaultValue(FALSE);
-         
+         ->defaultValue(TRUE);
+
     // Unmapped source fields
     $this->addFieldMapping(NULL, 'revision')
          ->description(t('Migration of revisions is possible, but not implemented in this migration'))
@@ -393,22 +393,22 @@ class DingCampaignMigration extends DingNodeMigration {
          ->description(t('Migration of revisions is possible, but not implemented in this migration'))
          ->issueGroup(t('DNM'));
   }
-  
+
   public function prepareRow($row) {
     // Always include this snippet, in case our parent class decides to ignore the row
     if (parent::prepareRow($row) === FALSE) {
        return FALSE;
     }
-    
+
     // Get values from serialized data and populate the source fields defined in our constructor
     $campaign_image_data = unserialize($row->field_campaign_image_data);
     $row->campaign_image_alt = $campaign_image_data['alt'];
     $row->campaign_image_title = $campaign_image_data['title'];
-    
+
     // Modify text in campaign_type
     $row->campaign_type = str_replace('-only', '', $row->campaign_type);
   }
-  
+
   // Modify the query to include ding_campaign data
   protected function query() {
     $query = parent::query();
@@ -422,7 +422,7 @@ class DingCampaignMigration extends DingNodeMigration {
 
 class DingPageMigration extends DingNodeMigration {
   public function __construct($arguments) {
-    
+
     $arguments = array(
       'description' => t('Migration of Pages from Ding1/D6'),
       'machine_name' => 'DingPage',
@@ -432,10 +432,10 @@ class DingPageMigration extends DingNodeMigration {
       'dependencies' => array('DingUser','DingTagsTerm', 'DingLibrary', 'DingFile'),
     );
 
-    // Add to sourceFields before calling parent constructor. 
+    // Add to sourceFields before calling parent constructor.
     // See http://www.acquia.com/blog/drupal-drupal-data-migration-part-2-architecture
     $this->sourceFields['list_image_title'] = t('Title text extracted from field_list_image_data');
-    
+
     parent::__construct($arguments);
 
     $this->addFieldMapping('field_ding_page_body', 'body');
@@ -455,7 +455,7 @@ class DingPageMigration extends DingNodeMigration {
     $this->addFieldMapping('field_ding_page_files:language')
          ->defaultValue('und');
     $this->addFieldMapping('field_ding_page_files:preserve_files')
-         ->defaultValue(FALSE);
+         ->defaultValue(TRUE);
     // Mapping remaining page file fields
     $this->addFieldMapping('field_ding_page_files:description', 'field_file_attachments:description');
     $this->addFieldMapping('field_ding_page_files:display', 'field_file_attachments:description')
@@ -470,7 +470,7 @@ class DingPageMigration extends DingNodeMigration {
     $this->addFieldMapping('field_ding_page_list_image:language')
          ->defaultValue('und');
     $this->addFieldMapping('field_ding_page_list_image:preserve_files')
-         ->defaultValue(FALSE);
+         ->defaultValue(TRUE);
     // Mapping remaining list image fields
     $this->addFieldMapping('field_ding_page_list_image:alt', 'field_list_image:alt');
     $this->addFieldMapping('field_ding_page_list_image:title', 'list_image_title');
@@ -520,20 +520,20 @@ class DingPageMigration extends DingNodeMigration {
 
     // Unmapped destination fields
     $this->addUnmigratedDestinations(array(
-      'field_ding_page_title_image', 
-      'field_ding_page_title_image:file_class', 
-      'field_ding_page_title_image:language', 
-      'field_ding_page_title_image:alt', 
+      'field_ding_page_title_image',
+      'field_ding_page_title_image:file_class',
+      'field_ding_page_title_image:language',
+      'field_ding_page_title_image:alt',
       'field_ding_page_title_image:title',
-      'field_ding_page_title_image:destination_dir', 
-      'field_ding_page_title_image:destination_file', 
-      'field_ding_page_title_image:file_replace', 
-      'field_ding_page_title_image:preserve_files', 
+      'field_ding_page_title_image:destination_dir',
+      'field_ding_page_title_image:destination_file',
+      'field_ding_page_title_image:file_replace',
+      'field_ding_page_title_image:preserve_files',
       'field_ding_page_title_image:source_dir',
       'field_ding_page_title_image:urlencode',
       'field_ding_page_materials',
     ));
-    
+
   }
 
   public function prepareRow($row) {
@@ -541,7 +541,7 @@ class DingPageMigration extends DingNodeMigration {
     if (parent::prepareRow($row) === FALSE) {
        return FALSE;
     }
-    
+
     // Get values from serialized data and populate the source fields defined in our constructor
     // file attachments
     $file_attachments_data = unserialize($row->field_file_attachments_data);
@@ -558,13 +558,13 @@ class DingPageMigration extends DingNodeMigration {
     // We perform this in complete() function since we need the nid on the news node just created
     parent::createDingNodeTingRefs($node, $row);
   }
-  
+
 }
 
 
 class DingNewsMigration extends DingNodeMigration {
   public function __construct($arguments) {
-    
+
     $arguments = array(
       'description' => t('Migration of Blogposts/News from Ding1/D6'),
       'machine_name' => 'DingNews',
@@ -574,7 +574,7 @@ class DingNewsMigration extends DingNodeMigration {
       'dependencies' => array('DingUser','DingNewsCategoryTerm','DingTagsTerm','DingFile','DingLibrary'),
     );
 
-    // Add to sourceFields before calling parent constructor. 
+    // Add to sourceFields before calling parent constructor.
     // See http://www.acquia.com/blog/drupal-drupal-data-migration-part-2-architecture
     $this->sourceFields['list_image_title'] = t('Title text extracted from field_list_image_data');
 
@@ -599,7 +599,7 @@ class DingNewsMigration extends DingNodeMigration {
     $this->addFieldMapping('field_ding_news_files:language')
          ->defaultValue('und');
     $this->addFieldMapping('field_ding_news_files:preserve_files')
-         ->defaultValue(FALSE);
+         ->defaultValue(TRUE);
     // Mapping remaining news file fields
     $this->addFieldMapping('field_ding_news_files:description', 'field_file_attachments:description');
     $this->addFieldMapping('field_ding_news_files:display', 'file_attachments_description')
@@ -614,7 +614,7 @@ class DingNewsMigration extends DingNodeMigration {
     $this->addFieldMapping('field_ding_news_list_image:language')
          ->defaultValue('und');
     $this->addFieldMapping('field_ding_news_list_image:preserve_files')
-         ->defaultValue(FALSE);
+         ->defaultValue(TRUE);
     // Mapping remaining list image fields
     $this->addFieldMapping('field_ding_news_list_image:alt', 'field_list_image:alt');
     $this->addFieldMapping('field_ding_news_list_image:title', 'list_image_title');
@@ -669,15 +669,15 @@ class DingNewsMigration extends DingNodeMigration {
 
     // Unmapped destination fields
     $this->addUnmigratedDestinations(array(
-      'field_ding_news_title_image', 
-      'field_ding_news_title_image:file_class', 
-      'field_ding_news_title_image:language', 
-      'field_ding_news_title_image:alt', 
+      'field_ding_news_title_image',
+      'field_ding_news_title_image:file_class',
+      'field_ding_news_title_image:language',
+      'field_ding_news_title_image:alt',
       'field_ding_news_title_image:title',
-      'field_ding_news_title_image:destination_dir', 
-      'field_ding_news_title_image:destination_file', 
-      'field_ding_news_title_image:file_replace', 
-      'field_ding_news_title_image:preserve_files', 
+      'field_ding_news_title_image:destination_dir',
+      'field_ding_news_title_image:destination_file',
+      'field_ding_news_title_image:file_replace',
+      'field_ding_news_title_image:preserve_files',
       'field_ding_news_title_image:source_dir',
       'field_ding_news_title_image:urlencode',
       'field_ding_news_library',
@@ -693,7 +693,7 @@ class DingNewsMigration extends DingNodeMigration {
     if (parent::prepareRow($row) === FALSE) {
        return FALSE;
     }
-    
+
     // Get values from serialized data and populate the source fields defined in our constructor
     // list images
     $list_image_data = unserialize($row->field_list_image_data);
@@ -701,7 +701,7 @@ class DingNewsMigration extends DingNodeMigration {
   }
 
   public function prepare($node, stdClass $row) {
-    // Assign news to library by manipulating node object directly. 
+    // Assign news to library by manipulating node object directly.
     // Ugly, but needs to be done this way until we have bumped OG version to 2.1, which contains the migrate classes needed by OG
     $this->setDingNewsGid($node, $row);
   }
@@ -726,7 +726,7 @@ class DingNewsMigration extends DingNodeMigration {
       $node->field_ding_news_library['und'][0]['gid'] = $gids[$ding2libnid];
       $node->field_ding_news_library['und'][0]['state'] = 1;
       $node->field_ding_news_library['und'][0]['created'] = time();
-      
+
       // Logging
       watchdog('migrate_ding1_ding2', 'Setting GID = %gid on news item (%title) (based on Ding2 library entity ID %ding2libnid - the Ding1 library nid was %old_nid)', array('%title'=>$node->title, '%gid' => $gids[$ding2libnid], '%ding2libnid' => $ding2libnid, '%old_nid' => $old_nid), WATCHDOG_INFO);
     }
@@ -736,7 +736,7 @@ class DingNewsMigration extends DingNodeMigration {
 
 class DingEventMigration extends DingNodeMigration {
   public function __construct($arguments) {
-    
+
     $arguments = array(
       'description' => t('Migration of Events from Ding1/D6'),
       'machine_name' => 'DingEvent',
@@ -746,11 +746,11 @@ class DingEventMigration extends DingNodeMigration {
       'dependencies' => array('DingUser','DingEventCategoryTerm','DingEventTargetTerm', 'DingTagsTerm', 'DingFile', 'DingLibrary'),
     );
 
-    // Add to sourceFields before calling parent constructor. 
+    // Add to sourceFields before calling parent constructor.
     // See http://www.acquia.com/blog/drupal-drupal-data-migration-part-2-architecture
     $this->sourceFields['list_image_alt'] = t('Alt text extracted from field_list_image_data');
     $this->sourceFields['list_image_title'] = t('Title text extracted from field_list_image_data');
-    
+
     parent::__construct($arguments);
 
     $this->addFieldMapping('field_ding_event_body', 'body');
@@ -775,7 +775,7 @@ class DingEventMigration extends DingNodeMigration {
     $this->addFieldMapping('field_ding_event_files:language')
          ->defaultValue('und');
     $this->addFieldMapping('field_ding_event_files:preserve_files')
-         ->defaultValue(FALSE);
+         ->defaultValue(TRUE);
     // Mapping remaining page file fields
     $this->addFieldMapping('field_ding_event_files:description', 'field_file_attachments:description');
     $this->addFieldMapping('field_ding_event_files:display', 'field_file_attachments:description')
@@ -790,7 +790,7 @@ class DingEventMigration extends DingNodeMigration {
     $this->addFieldMapping('field_ding_event_list_image:language')
          ->defaultValue('und');
     $this->addFieldMapping('field_ding_event_list_image:preserve_files')
-         ->defaultValue(FALSE);
+         ->defaultValue(TRUE);
     // Mapping remaining list image fields
     $this->addFieldMapping('field_ding_event_list_image:alt', 'list_image_alt');
     $this->addFieldMapping('field_ding_event_list_image:title', 'list_image_title');
@@ -807,7 +807,7 @@ class DingEventMigration extends DingNodeMigration {
     $this->addFieldMapping('field_ding_event_location:administrative_area', 'province');
     $this->addFieldMapping('field_ding_event_location:postal_code', 'postal_code');
     $this->addFieldMapping('field_ding_event_location:name_line', 'name');
-    
+
     // Since the excerpt is mapped via an argument, add a null mapping so it's not flagged as unmapped.
     $this->addFieldMapping(NULL, 'latitude');
     $this->addFieldMapping(NULL, 'longitude');
@@ -872,15 +872,15 @@ class DingEventMigration extends DingNodeMigration {
 
     // Unmapped destination fields
     $this->addUnmigratedDestinations(array(
-      'field_ding_event_title_image', 
-      'field_ding_event_title_image:file_class', 
-      'field_ding_event_title_image:language', 
-      'field_ding_event_title_image:alt', 
+      'field_ding_event_title_image',
+      'field_ding_event_title_image:file_class',
+      'field_ding_event_title_image:language',
+      'field_ding_event_title_image:alt',
       'field_ding_event_title_image:title',
-      'field_ding_event_title_image:destination_dir', 
-      'field_ding_event_title_image:destination_file', 
-      'field_ding_event_title_image:file_replace', 
-      'field_ding_event_title_image:preserve_files', 
+      'field_ding_event_title_image:destination_dir',
+      'field_ding_event_title_image:destination_file',
+      'field_ding_event_title_image:file_replace',
+      'field_ding_event_title_image:preserve_files',
       'field_ding_event_title_image:source_dir',
       'field_ding_event_title_image:urlencode',
       'field_ding_event_library',
@@ -905,18 +905,18 @@ class DingEventMigration extends DingNodeMigration {
     if (module_exists('ding_place2book')) {
       throw new MigrateException(t('Turn ding_place2book module OFF before running DingEventMigration'));
     }
-    
+
     // Always include this snippet, in case our parent class decides to ignore the row
     if (parent::prepareRow($row) === FALSE) {
        return FALSE;
     }
-    
+
     // Get values from serialized data and populate the source fields defined in our constructor
     // list images
     $list_image_data = unserialize($row->field_list_image_data);
     $row->list_image_alt = $list_image_data['alt'];
     $row->list_image_title = $list_image_data['title'];
-    
+
     // Handle date field
     $date_data = array(
       'from' => $row->field_datetime,
@@ -924,14 +924,14 @@ class DingEventMigration extends DingNodeMigration {
     );
     // Datetime field handler accepts data as json array.
     $row->field_datetime = drupal_json_encode($date_data);
-    
+
     // Make country code uppercase
     $row->country = strtoupper($row->country);
 
   }
 
   public function prepare($node, stdClass $row) {
-    // Assign news to library by manipulating node object directly. 
+    // Assign news to library by manipulating node object directly.
     // Ugly, but needs to be done this way until we have bumped OG version to 2.1, which contains the migrate classes needed by OG
     $this->setDingEventGid($node, $row);
   }
@@ -956,7 +956,7 @@ class DingEventMigration extends DingNodeMigration {
       $node->field_ding_event_library['und'][0]['gid'] = $gids[$ding2libnid];
       $node->field_ding_event_library['und'][0]['state'] = 1;
       $node->field_ding_event_library['und'][0]['created'] = time();
-      
+
       // Logging
       watchdog('migrate_ding1_ding2', 'Setting GID = %gid on event item (%title) (based on Ding2 library entity ID %ding2libnid - the Ding1 library nid was %old_nid)', array('%title'=>$node->title, '%gid' => $gids[$ding2libnid], '%ding2libnid' => $ding2libnid, '%old_nid' => $old_nid), WATCHDOG_INFO);
     }
