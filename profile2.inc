@@ -210,7 +210,7 @@ class DingProfileStaffMigration extends Migration {
     // Even though default is termname, :source_type needs to be explicitly set
     // to something other than tid for the migration to work
     $this->addFieldMapping('field_ding_staff_department:source_type')
-         ->defaultValue('name'))
+         ->defaultValue('name')
          ->description(t('Explicitly set to other value than -tid-, i.e. -name- in this case'));
     $this->addFieldMapping('field_ding_staff_department:create_term')
          ->defaultValue(TRUE);
