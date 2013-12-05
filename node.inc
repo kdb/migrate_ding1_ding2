@@ -458,8 +458,6 @@ class DingPageMigration extends DingNodeMigration {
          ->defaultValue(TRUE);
     // Mapping remaining page file fields
     $this->addFieldMapping('field_ding_page_files:description', 'field_file_attachments:description');
-    $this->addFieldMapping('field_ding_page_files:display', 'field_file_attachments:description')
-         ->description(t('Use file_attachments_description again for this value'));
 
     // Map the list image field to the new list image field, base this on the DingFile migration
     // to map the files to the imported files table.
@@ -531,6 +529,7 @@ class DingPageMigration extends DingNodeMigration {
       'field_ding_page_title_image:preserve_files',
       'field_ding_page_title_image:source_dir',
       'field_ding_page_title_image:urlencode',
+      'field_ding_page_files:display',
       'field_ding_page_materials',
     ));
 
@@ -602,8 +601,6 @@ class DingNewsMigration extends DingNodeMigration {
          ->defaultValue(TRUE);
     // Mapping remaining news file fields
     $this->addFieldMapping('field_ding_news_files:description', 'field_file_attachments:description');
-    $this->addFieldMapping('field_ding_news_files:display', 'field_file_attachments:description')
-         ->description(t('Use field_file_attachments:description again for this value'));
 
     // Map the list image field to the new list image field, base this on the DingFile migration
     // to map the files to the imported files table.
@@ -680,6 +677,7 @@ class DingNewsMigration extends DingNodeMigration {
       'field_ding_news_title_image:preserve_files',
       'field_ding_news_title_image:source_dir',
       'field_ding_news_title_image:urlencode',
+      'field_ding_news_files:display',
       'ding_news_groups_ref',
       'field_ding_news_materials',
     ));
@@ -750,8 +748,6 @@ class DingEventMigration extends DingNodeMigration {
          ->defaultValue(TRUE);
     // Mapping remaining page file fields
     $this->addFieldMapping('field_ding_event_files:description', 'field_file_attachments:description');
-    $this->addFieldMapping('field_ding_event_files:display', 'field_file_attachments:description')
-         ->description(t('Use field_file_attachments:description again for this value'));
 
     // Map the list image field to the new list image field, base this on the DingFile migration
     // to map the files to the imported files table.
@@ -856,6 +852,7 @@ class DingEventMigration extends DingNodeMigration {
       'field_ding_event_title_image:preserve_files',
       'field_ding_event_title_image:source_dir',
       'field_ding_event_title_image:urlencode',
+      'field_ding_event_files:display',
       'field_ding_event_materials',
       'ding_event_groups_ref',
       'field_ding_event_location:sub_administrative_area',
