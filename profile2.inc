@@ -215,7 +215,7 @@ class DingProfileStaffMigration extends Migration {
     $this->addFieldMapping('field_ding_staff_department:create_term')
          ->defaultValue(TRUE);
     $this->addFieldMapping('field_ding_staff_department:ignore_case')
-         ->defaultValue(FALSE);
+         ->defaultValue(TRUE);
     $this->addFieldMapping('og_group_ref', 'libraries')
          ->sourceMigration('DingLibrary')
          ->description(t('See prepareRow method'));
