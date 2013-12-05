@@ -121,7 +121,8 @@ class DingLibraryMigration extends DingNodeMigration {
     $this->addFieldMapping('field_ding_library_list_image:alt', 'field_list_image:alt');
     $this->addFieldMapping('field_ding_library_list_image:title', 'list_image_title');
     $this->addFieldMapping(NULL, 'field_list_image:data')
-         ->description(t('Split this into list_image_title for D7'));
+         ->description(t('Split this into list_image_title for D7'))
+         ->issueGroup(t('DNM'));
     $this->addFieldMapping(NULL, 'field_list_image:list');
 
     // Map the image field to the new title image field, base this on the DingFile migration
@@ -137,7 +138,8 @@ class DingLibraryMigration extends DingNodeMigration {
     $this->addFieldMapping('field_ding_library_title_image:alt', 'field_image:alt');
     $this->addFieldMapping('field_ding_library_title_image:title', 'image_title');
     $this->addFieldMapping(NULL, 'field_image:data')
-         ->description(t('Split this into image_title for D7'));
+         ->description(t('Split this into image_title for D7'))
+         ->issueGroup(t('DNM'));
     $this->addFieldMapping(NULL, 'field_image:list');
 
     // Map to addressfield. See https://drupal.org/node/1996546.
@@ -351,7 +353,8 @@ class DingCampaignMigration extends DingNodeMigration {
     $this->addFieldMapping('field_camp_image:alt', 'campaign_image_alt');
     $this->addFieldMapping('field_camp_image:title', 'campaign_image_title');
     $this->addFieldMapping(NULL, 'field_campaign_image:data')
-         ->description(t('Split this into campaign_image_alt and campaign_image_title for D7'));
+         ->description(t('Split this into campaign_image_alt and campaign_image_title for D7'))
+         ->issueGroup(t('DNM'));
     $this->addFieldMapping(NULL, '2')
          ->description(t('Ding2 does not employ the Tags taxonomy (taxonomy "2") for campaigns'));
     $this->addFieldMapping(NULL, 'field_campaign_link:title')
@@ -473,7 +476,8 @@ class DingPageMigration extends DingNodeMigration {
     $this->addFieldMapping('field_ding_page_list_image:alt', 'field_list_image:alt');
     $this->addFieldMapping('field_ding_page_list_image:title', 'list_image_title');
     $this->addFieldMapping(NULL, 'field_list_image:data')
-         ->description(t('Split this into list_image_title for D7'));
+         ->description(t('Split this into list_image_title for D7'))
+         ->issueGroup(t('DNM'));
     $this->addFieldMapping(NULL, 'field_list_image:list');
 
     // ting references
