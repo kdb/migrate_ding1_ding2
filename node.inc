@@ -534,6 +534,7 @@ class DingPageMigration extends DingNodeMigration {
       'field_ding_page_title_image:source_dir',
       'field_ding_page_title_image:urlencode',
       'field_ding_page_files:display',
+      'ding_page_group_ref',
       'field_ding_page_materials',
     ));
 
