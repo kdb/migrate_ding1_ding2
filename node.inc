@@ -761,11 +761,11 @@ class DingEventMigration extends DingNodeMigration {
     $this->addFieldMapping('field_ding_event_lead', 'field_teaser');
     $this->addFieldMapping('field_ding_event_lead:language')
          ->defaultValue('und');
-    $this->addFieldMapping(NULL, 'field_library_ref')
-         ->description(t('Handled in prepare function'));
     $this->addFieldMapping('field_ding_event_date', 'field_datetime');
     $this->addFieldMapping('field_ding_event_date:value2', 'field_datetime:value2');
     $this->addFieldMapping('field_ding_event_price', 'field_entry_price');
+    $this->addFieldMapping('og_group_ref', 'field_library_ref')
+         ->sourceMigration('DingLibrary');
 
     // Files mapping
     $this->addFieldMapping('field_ding_event_files', 'field_file_attachments')
@@ -795,7 +795,8 @@ class DingEventMigration extends DingNodeMigration {
     $this->addFieldMapping('field_ding_event_list_image:alt', 'list_image_alt');
     $this->addFieldMapping('field_ding_event_list_image:title', 'list_image_title');
     $this->addFieldMapping(NULL, 'field_list_image:data')
-         ->description(t('Split this into list_image_alt and list_image_title for D7'));
+         ->description(t('Split this into list_image_alt and list_image_title for D7'))
+         ->issueGroup(t('DNM'));
     $this->addFieldMapping(NULL, 'field_list_image:list');
     $this->addFieldMapping(NULL, 'field_list_image:alt');
 
@@ -883,10 +884,8 @@ class DingEventMigration extends DingNodeMigration {
       'field_ding_event_title_image:preserve_files',
       'field_ding_event_title_image:source_dir',
       'field_ding_event_title_image:urlencode',
-      'field_ding_event_library',
       'field_ding_event_materials',
-      'field_ding_event_library:state',
-      'field_ding_event_library:created',
+      'ding_event_groups_ref',
       'field_ding_event_location:sub_administrative_area',
       'field_ding_event_location:dependent_locality',
       'field_ding_event_location:sub_premise',
@@ -930,36 +929,10 @@ class DingEventMigration extends DingNodeMigration {
 
   }
 
-  public function prepare($node, stdClass $row) {
-    // Assign news to library by manipulating node object directly.
-    // Ugly, but needs to be done this way until we have bumped OG version to 2.1, which contains the migrate classes needed by OG
-    $this->setDingEventGid($node, $row);
-  }
-
   public function complete($node, stdClass $row) {
     // Create Ting objects and relation to it for each item i field_ting_refs
     // We perform this in complete() function since we need the nid on the news node just created
     parent::createDingNodeTingRefs($node, $row);
-  }
-
-  // function to set GID for a ding_event node
-  private function setDingEventGid($node, $row) {
-    $old_nid = $row->field_library_ref[0];
-
-    // Process if old Ding1 node has a field_library_ref value
-    if ($old_nid) {
-      // Get new entity ID for the library from the mappings
-      $ding2libnid = db_query("SELECT destid1 FROM {migrate_map_dinglibrary} WHERE sourceid1 = :sourceid1", array(':sourceid1' => $old_nid))->fetchField();
-      $gids = og_get_group_ids('node', array($ding2libnid), array(OG_STATE_ACTIVE), FALSE);
-
-      // Modify the node
-      $node->field_ding_event_library['und'][0]['gid'] = $gids[$ding2libnid];
-      $node->field_ding_event_library['und'][0]['state'] = 1;
-      $node->field_ding_event_library['und'][0]['created'] = time();
-
-      // Logging
-      watchdog('migrate_ding1_ding2', 'Setting GID = %gid on event item (%title) (based on Ding2 library entity ID %ding2libnid - the Ding1 library nid was %old_nid)', array('%title'=>$node->title, '%gid' => $gids[$ding2libnid], '%ding2libnid' => $ding2libnid, '%old_nid' => $old_nid), WATCHDOG_INFO);
-    }
   }
 
   // Modify the query to include location data
@@ -984,4 +957,3 @@ class DingEventMigration extends DingNodeMigration {
   }
 
 }
-
