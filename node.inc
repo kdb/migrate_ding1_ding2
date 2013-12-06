@@ -275,6 +275,7 @@ class DingLibraryMigration extends DingNodeMigration {
       'field_ding_library_geocode:srid',
       'field_ding_library_geocode:accuracy',
       'field_ding_library_geocode:source',
+      'og_group_ref',
     ));
   }
 
