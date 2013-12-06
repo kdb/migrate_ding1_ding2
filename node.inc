@@ -29,6 +29,7 @@ abstract class DingNodeMigration extends DrupalNode6Migration {
     //$this->addUnmigratedDestinations(array('log', 'tnid', 'translate', 'body:summary', 'body:format', 'body:language', 'comment'))
   }
 
+
   // function to create ting objects with relations to the node
   public function createDingNodeTingRefs($node, $row) {
 
@@ -59,6 +60,73 @@ abstract class DingNodeMigration extends DrupalNode6Migration {
         watchdog('migrate_ding1_ding2', 'Created Ting object reference(s) (%refs) with relation(s) on item (%title - D7 nid %d7nid)', array('%refs' => $refs, '%title'=>$node->title, '%d7nid'=>$node->nid), WATCHDOG_INFO);
       }
     }
+  }
+
+
+  /**
+   * Function to replace IMG-tags in body text with Media tokens
+   *
+   * @param $row
+   *
+   * @return modified body text
+   */
+  public function img2mediatoken($row) {
+    // Regex pattern that matches img tags containg /sites/default/files/ in src attribute,
+    // and also returns a matching group with the content of src-string after ../sites/default/files/
+    $regexp = '/<img.*src\s*=\s*[\"\'].*\/sites\/default\/files\/([^"\']+)[\"\'][^>]+>/i';
+    // Returns an array of arrays with
+    // first element = full img tag,
+    // 2nd element = filepath after "../sites/default/files/"
+    preg_match_all($regexp, $row->body, $img_tags, PREG_SET_ORDER);
+
+    // create new array with the keys being the filepaths to lookup in legacy db and the values being tag content
+    foreach ($img_tags as $img_tag) {
+      $img_file_tag['sites/default/files/' . $img_tag[1]] = array(
+        'tag_html' => $img_tag[0],
+        'legacy_filepath' => 'sites/default/files/' . $img_tag[1],
+      );
+    }
+
+    // Check if src exists among the files in the SOURCE and get their fid from source db
+    $legacy_files_result = Database::getConnection('default', 'legacy')
+      ->select('files', 'f')
+      ->fields('f', array('fid', 'filepath'))
+      ->condition('filepath', array_keys($img_file_tag), 'IN')
+      ->execute();
+    $legacy_fids = array();
+
+    foreach ($legacy_files_result as $legacy_row) {
+      // append old fid to our $img_file_tag array
+      $img_file_tag[$legacy_row->filepath]['legacy_fid'] = $legacy_row->fid;
+
+      // Get and append new fid to array
+      $new_fid = $new_fid_query = db_select('migrate_map_dingfile', 'mmf')
+        ->fields('mmf', array('destid1'))
+        ->condition('sourceid1', $legacy_row->fid)
+        ->execute()
+        ->fetchField();
+
+      if ($new_fid) {
+        // append new fid to array
+        $img_file_tag[$legacy_row->filepath]['new_fid'] = $new_fid;
+        // Build new media tokens and append to array
+        $img_file_tag[$legacy_row->filepath]['new_fid_token'] = '[[{"fid":"' . $new_fid . '","view_mode":"default","fields":{"format":"default","field_file_image_alt_text[und][0][value]":"","field_file_image_title_text[und][0][value]":""},"type":"media","attributes":{"alt":"","title":"","class":"media-element file-default"}}]]';
+      }
+    }
+
+    // Replace img-tags with media tokens in body text
+    $replace_count = 0;
+    foreach ($img_file_tag as $img_item) {
+      $row->body = str_replace($img_item['tag_html'], $img_item['new_fid_token'], $row->body);
+      $replace_count++;
+    }
+
+    if ($replace_count > 0) {
+      // Logging
+      watchdog('migrate_ding1_ding2', 'Found and replaced %count IMG-tags with media tokens on item (%title - D7 nid %d7nid)', array('%count' => $replace_count, '%title'=>$row->title, '%d7nid'=>$row->nid), WATCHDOG_INFO);
+    }
+
+    return $row->body;
   }
 
 }
@@ -296,6 +364,9 @@ class DingLibraryMigration extends DingNodeMigration {
 
     // Make country code uppercase
     $row->country = strtoupper($row->country);
+
+    // Replace img-tags found in body with the corresponding media tokens
+    $row->body = parent::img2mediatoken($row);
   }
 
   // Modify the query to include location data
@@ -556,6 +627,9 @@ class DingPageMigration extends DingNodeMigration {
     $list_image_data = unserialize($row->field_list_image_data);
     $row->list_image_alt = $list_image_data['alt'];
     $row->list_image_title = $list_image_data['title'];
+
+    // Replace img-tags found in body with the corresponding media tokens
+    $row->body = parent::img2mediatoken($row);
   }
 
   public function complete($node, stdClass $row) {
@@ -700,6 +774,9 @@ class DingNewsMigration extends DingNodeMigration {
     // list images
     $list_image_data = unserialize($row->field_list_image_data);
     $row->list_image_title = $list_image_data['title'];
+
+    // Replace img-tags found in body with the corresponding media tokens
+    $row->body = parent::img2mediatoken($row);
   }
 
   public function complete($node, stdClass $row) {
@@ -902,6 +979,8 @@ class DingEventMigration extends DingNodeMigration {
     // Make country code uppercase
     $row->country = strtoupper($row->country);
 
+    // Replace img-tags found in body with the corresponding media tokens
+    $row->body = parent::img2mediatoken($row);
   }
 
   public function complete($node, stdClass $row) {
