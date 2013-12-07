@@ -79,6 +79,11 @@ abstract class DingNodeMigration extends DrupalNode6Migration {
     // 2nd element = filepath after "../sites/default/files/"
     preg_match_all($regexp, $row->body, $img_tags, PREG_SET_ORDER);
 
+    // Return if no IMG tags were found
+    if (empty($img_tags)) {
+      return $row->body;
+    }
+
     // create new array with the keys being the filepaths to lookup in legacy db and the values being tag content
     foreach ($img_tags as $img_tag) {
       $img_file_tag['sites/default/files/' . $img_tag[1]] = array(
@@ -123,7 +128,7 @@ abstract class DingNodeMigration extends DrupalNode6Migration {
 
     if ($replace_count > 0) {
       // Logging
-      watchdog('migrate_ding1_ding2', 'Found and replaced %count IMG-tags with media tokens on item (%title - D7 nid %d7nid)', array('%count' => $replace_count, '%title'=>$row->title, '%d7nid'=>$row->nid), WATCHDOG_INFO);
+      watchdog('migrate_ding1_ding2', 'Found and replaced %count IMG-tags with media tokens on item (title: %title)', array('%count' => $replace_count, '%title'=>$row->title), WATCHDOG_INFO);
     }
 
     return $row->body;
