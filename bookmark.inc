@@ -21,7 +21,7 @@ abstract class DingFlagMigration extends Migration {
     $this->destination_fid = $arguments['destination_fid'];
     $this->source_key = $arguments['source_key'];
     
-    $this->source = new MigrateSourceSQL($this->query());
+    $this->source = new MigrateSourceSQL($this->query(), array(), NULL, array('map_joinable' => FALSE));
     $this->destination = new MigrateDestinationFlagSimple($this->destination_fid);
     
     $this->map = new MigrateSQLMap(

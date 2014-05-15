@@ -21,7 +21,7 @@ abstract class DingTableMigration extends Migration {
     $this->destination_table = $arguments['destination_table'];
     $this->source_key = $arguments['source_key'];
     
-    $this->source = new MigrateSourceSQL($this->query());
+    $this->source = new MigrateSourceSQL($this->query(), array(), NULL, array('map_joinable' => FALSE));
     $this->destination = new MigrateDestinationTable($this->destination_table);
 
     $this->map = new MigrateSQLMap(
@@ -169,14 +169,14 @@ class DingAuthmapMigration extends DingTableMigration {
     
     // In D7/Ding2, it is ding_user module that handles authentication for external users,
     // so we set module to ding_user when migrating authmap table
-    $this->addFieldMapping('module')
+    $this->addFieldMapping('module', 'module')
          ->defaultValue('ding_user');
     
     $this->addFieldMapping('uid', 'uid')
          ->sourceMigration('DingUser');
          
     // Unmapped source fields
-    $this->addUnmigratedSources(array('aid', 'module'));
+    $this->addUnmigratedSources(array('aid'));
     
     // Unmapped destination fields
     $this->addUnmigratedDestinations(array('aid'));

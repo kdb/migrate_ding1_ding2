@@ -396,8 +396,8 @@ class DingLibraryMigration extends DingNodeMigration {
     $query->addField('lp', 'phone');
     $query->leftJoin('location_fax', 'lf', 'lf.lid=l.lid');
     $query->addField('lf', 'fax');
-    $query->leftJoin('ding_library', 'dl', 'n.nid=dl.nid AND n.vid = dl.vid');
-    $query->addField('dl', 'slug');
+    $query->leftJoin('panels_subsites_slugs', 'pss', 'n.nid=pss.nid');
+    $query->addField('pss', 'slug');
     return $query;
   }
 }

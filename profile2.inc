@@ -36,7 +36,7 @@ class DingProfileProviderAlmaMigration extends Migration {
     );
 
     // Create a MigrateSource object, which manages retrieving the input data.
-    $this->source = new MigrateSourceSQL($this->query(), $this->sourceFields, NULL);
+    $this->source = new MigrateSourceSQL($this->query(), $this->sourceFields, NULL, array('map_joinable' => FALSE));
 
     $this->destination = new MigrateDestinationProfile2('provider_alma');
 
@@ -174,7 +174,7 @@ class DingProfileStaffMigration extends Migration {
     );
 
     // Create a MigrateSource object, which manages retrieving the input data.
-    $this->source = new MigrateSourceSQL($this->query(), $this->sourceFields, NULL);
+    $this->source = new MigrateSourceSQL($this->query(), $this->sourceFields, NULL, array('map_joinable' => FALSE));
 
     $this->destination = new MigrateDestinationProfile2('ding_staff_profile');
 
@@ -288,18 +288,18 @@ class DingProfileStaffMigration extends Migration {
 
     // Populate departments
     $departments_array = array();
-    $dep_query = Database::getConnection('default', 'legacy')
-        ->select('content_field_department', 'cfd')
-        ->fields('cfd', array('field_department_value'))
-        ->condition('nid', $row->nid)
-        ->condition('vid', $row->vid);
-    $dep_result = $dep_query->execute();
-    foreach ($dep_result as $dep_row) {
-      if ((!in_array($dep_row->field_department_value, $departments_array)) &&
-          (!empty($dep_row->field_department_value))) {
-        $departments_array[] = $dep_row->field_department_value;
-      }
-    }
+    // $dep_query = Database::getConnection('default', 'legacy')
+    //     ->select('content_field_department', 'cfd')
+    //     ->fields('cfd', array('field_department_value'))
+    //     ->condition('nid', $row->nid)
+    //     ->condition('vid', $row->vid);
+    // $dep_result = $dep_query->execute();
+    // foreach ($dep_result as $dep_row) {
+    //   if ((!in_array($dep_row->field_department_value, $departments_array)) &&
+    //       (!empty($dep_row->field_department_value))) {
+    //     $departments_array[] = $dep_row->field_department_value;
+    //   }
+    // }
     $row->departments = $departments_array;
 
     //Populate libraries
@@ -340,9 +340,10 @@ class DingProfileStaffMigration extends Migration {
     $query->leftJoin('content_type_profile', 'ctp', 'n.nid = ctp.nid AND n.vid = ctp.vid');
     $query->addField('ctp','field_staff_title_value');
     $query->addField('ctp','field_work_area_value');
-    $query->addField('ctp','field_firstname_value');
-    $query->addField('ctp','field_phone_value');
-    $query->addField('ctp','field_surname_value');
+    // $query->addField('ctp','field_firstname_value');
+    $query->addField('ctp', 'field_staff_phone_value');
+    $query->join('ding_user', 'du', 'n.uid = du.uid');
+    $query->addField('du', 'display_name');
     $query->orderBy('n.nid', 'ASC');
     // See more at: http://www.grasmash.com/article/migrate-classes-content-profile-profile2#sthash.5JUMSwgz.dpuf
     return $query;
