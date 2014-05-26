@@ -78,9 +78,10 @@ abstract class DingNodeMigration extends DrupalNode6Migration {
    * @return modified body text
    */
   public function img2mediatoken($row) {
+    $file_directory_path = variable_get('migrate_ding1_ding2_file_directory_path', 'sites/default/files');
     // Regex pattern that matches img tags containg /sites/default/files/ in src attribute,
     // and also returns a matching group with the content of src-string after ../sites/default/files/
-    $regexp = '/<img.*src\s*=\s*[\"\'].*\/sites\/default\/files\/([^"\']+)[\"\'][^>]+>/i';
+    $regexp = '/<img.*src\s*=\s*[\"\'].*\/' . preg_quote($file_directory_path, '/') . '\/([^"\']+)[\"\'][^>]+>/i';
     // Returns an array of arrays with
     // first element = full img tag,
     // 2nd element = filepath after "../sites/default/files/"
@@ -93,9 +94,9 @@ abstract class DingNodeMigration extends DrupalNode6Migration {
 
     // create new array with the keys being the filepaths to lookup in legacy db and the values being tag content
     foreach ($img_tags as $img_tag) {
-      $img_file_tag['sites/default/files/' . $img_tag[1]] = array(
+      $img_file_tag[$file_directory_path . '/' . $img_tag[1]] = array(
         'tag_html' => $img_tag[0],
-        'legacy_filepath' => 'sites/default/files/' . $img_tag[1],
+        'legacy_filepath' => $file_directory_path . '/' . $img_tag[1],
       );
     }
 

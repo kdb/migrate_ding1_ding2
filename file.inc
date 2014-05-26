@@ -40,7 +40,8 @@ class DingFileMigration extends DrupalFile6Migration {
 
   //Function to strip "sites/default/files/" and modify path based on strings in filepath
   protected function get_modified_path($value) {
-    $value = str_replace('sites/default/files/', '', $value);
+    $file_directory_path = variable_get('migrate_ding1_ding2_file_directory_path', 'sites/default/files');
+    $value = str_replace($file_directory_path . '/', '', $value);
 
     // Get path part
     $path_value = substr($value, 0, strpos($value,'/'));
