@@ -36,9 +36,16 @@ abstract class DingNodeMigration extends DrupalNode6Migration {
     if (isset($row->field_ting_refs) && count($row->field_ting_refs) > 0) {
 
       $refs = '';
+      $agency = variable_get('ting_agency', FALSE);
 
       foreach ($row->field_ting_refs as $ref) {
         if ($ref) {
+
+          // Convert data well 2 references to data well 3 references.
+          if ($agency && preg_match('/^(\d{6}):(\w+)$/', $ref, $matches)) {
+            $ref = ding_provider_build_entity_id($matches[2], $matches[1]);
+          }
+
           // Save a ting object entity
           $tid = migrate_ding1_ding2_add_ting_object($ref);
 
