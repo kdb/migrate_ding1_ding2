@@ -14,7 +14,7 @@ class DingUserMigration extends DrupalUser6Migration {
       'role_migration' => 'DingRole',
     );
 
-    parent::__construct($arguments + $common_arguments);
+    parent::__construct(array_merge($arguments, $common_arguments));
 
     // Unmapped source fields
     $this->addUnmigratedSources(array(
